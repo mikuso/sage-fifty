@@ -12,5 +12,12 @@
     "lodash": "^4.13.1",
     "odbc": "^1.2.1",
     "promise-queue": "^2.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikuso/sage-fifty"
+  },
+  "bugs": {
+    "url": "https://github.com/mikuso/sage-fifty/issues"
   }
 }
