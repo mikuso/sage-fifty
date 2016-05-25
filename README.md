@@ -9,7 +9,7 @@ Prerequisites
 -------------
 * Windows
 * .NET framework 4.5
-* Sage Accounts 50 Professional v22 (2016)
+* Sage 50 Accounts Professional v22 (2016)
 * Sage Line 50 ODBC drivers (installed with Sage)
 * Sage Data Objects (SDO) COM libraries (installed with Sage)
 
