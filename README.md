@@ -18,6 +18,13 @@ Example Usage
 ```js
 var Sage50 = require('sage-fifty');
 
+// create a new sage link
+var sage = new Sage50({
+	accdata: "C:\\ProgramData\\Sage\\Accounts\\2016\\Demodata\\ACCDATA",
+	username: "manager",
+	version: 22
+});
+
 // a simple database query
 sage.db.queryAsync("SELECT TOP 5 ACCOUNT_REF, SPLIT_NUMBER FROM AUDIT_SPLIT").then(function(splits){
 	console.log('5 SPLITS:', splits);
