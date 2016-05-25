@@ -1,9 +1,12 @@
 {
   "name": "sage-fifty",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Interact with Sage50 Accounts",
   "main": "sage-fifty.js",
-  "keywords": ["sage50", "sage"],
+  "keywords": [
+    "sage50",
+    "sage"
+  ],
   "author": "Gareth Hughes <npm_sage-fifty@flamescape.com>",
   "license": "ISC",
   "dependencies": {
