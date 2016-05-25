@@ -45,7 +45,7 @@ function Sage50(options) {
     ].join("");
 
     // connect to the odbc data
-	this.db = this._odbc
+	this._db = this._odbc
 		.openAsync(this._connStr)
 		.return(this._odbc)
 		.wrap(odbc.Database.prototype);
@@ -89,6 +89,10 @@ Sage50.prototype.payInFull = function(options){
         AccountRef   : options.accountRef,
         Splits       : options.splits
     }, options.onprogress);
+};
+
+Sage50.prototype.db = function(){
+	return this._db;
 };
 
 module.exports = Sage50;
