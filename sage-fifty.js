@@ -3,7 +3,7 @@ var odbc = require('odbc');
 Promise.promisifyAll(odbc.Database.prototype);
 var _ = require('lodash');
 var path = require('path');
-var PayInFull = require('./payinfull/');
+var PayInFull = require('./sage-fifty-payinfull');
 var debug = require('debug')('sage-fifty');
 
 function Sage50(options) {
