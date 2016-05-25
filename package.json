@@ -1,0 +1,16 @@
+{
+  "name": "sage-fifty",
+  "version": "0.0.1",
+  "description": "Interact with Sage50 Accounts",
+  "main": "sage-fifty.js",
+  "keywords": ["sage50", "sage"],
+  "author": "Gareth Hughes <npm_sage-fifty@flamescape.com>",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird-wrap": "0.0.2",
+    "debug": "^2.2.0",
+    "lodash": "^4.13.1",
+    "odbc": "^1.2.1",
+    "promise-queue": "^2.2.3"
+  }
+}
