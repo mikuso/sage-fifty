@@ -2,6 +2,8 @@ Description
 -----------
 This is an early prototype of a Sage 50 Accounts interface for NodeJS.
 
+![Dependencies](https://david-dm.org/mikuso/sage-fifty.svg)
+![Issues](https://img.shields.io/github/issues/mikuso/sage-fifty.svg)
 
 Prerequisites
 -------------
