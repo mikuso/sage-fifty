@@ -1,3 +1,5 @@
+"use strict";
+
 var Promise = require('bluebird');
 var odbc = require('odbc');
 Promise.promisifyAll(odbc.Database.prototype);
@@ -94,8 +96,8 @@ class Sage50 {
 	}
 
 
-	query (sql) {
-		return this._db.call('queryAsync', arguments);
+	query (sql, params) {
+		return this._db.call('queryAsync', sql, params);
 	}
 }
 
