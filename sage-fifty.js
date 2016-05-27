@@ -36,23 +36,6 @@ class Sage50 {
 		this._password = options.password || "";
 		this._version = options.version;
 
-		this._odbc = odbc();
-		this._connStr = [
-	        "Driver={Sage Line 50 v",
-	        this._version,
-	        "};DIR=",
-	        this._accdata,
-	        ";UseDataPath=No;UID=",
-	        this._username,
-	        ";PWD=",
-	        this._password
-	    ].join("");
-
-	    // connect to the odbc data
-		this._db = this._odbc
-			.openAsync(this._connStr)
-			.return(this._odbc);
-
 		debug("Sage50 linked to", this._accdata);
 	}
 
@@ -95,8 +78,31 @@ class Sage50 {
 	    }, options.onprogress);
 	}
 
+	_dbConnect () {
+		if (!!this._db) {
+			return;
+		}
+
+		this._odbc = odbc();
+		this._connStr = [
+	        "Driver={Sage Line 50 v",
+	        this._version,
+	        "};DIR=",
+	        this._accdata,
+	        ";UseDataPath=No;UID=",
+	        this._username,
+	        ";PWD=",
+	        this._password
+	    ].join("");
+
+	    // connect to the odbc data
+		this._db = this._odbc
+			.openAsync(this._connStr)
+			.return(this._odbc);
+	}
 
 	query (sql, params) {
+		this._dbConnect();
 		return this._db.call('queryAsync', sql, params);
 	}
 }
