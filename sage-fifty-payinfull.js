@@ -1,5 +1,5 @@
 var sageAccessQueue = require('./access-queue');
-var Promise = require('bluebird-wrap');
+var Promise = require('bluebird');
 var child_process = require('child_process');
 var path = require('path');
 var _ = require('lodash');

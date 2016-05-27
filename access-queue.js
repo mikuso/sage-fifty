@@ -1,4 +1,4 @@
-var Promise = require('bluebird-wrap'); 
+var Promise = require('bluebird'); 
 var PromiseQueue = require('promise-queue');
 PromiseQueue.configure(Promise);
 var path = require('path');

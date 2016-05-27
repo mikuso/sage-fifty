@@ -8,7 +8,7 @@ var sage = new Sage50({
 });
 
 // a database query
-sage.db().queryAsync("SELECT TOP 5 account_ref, split_number FROM audit_split").then(function(splits){
+sage.query("SELECT TOP 5 account_ref, split_number FROM audit_split").then(function(splits){
 	console.log('5 SPLITS:', splits);
 });
 

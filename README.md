@@ -28,7 +28,7 @@ var sage = new Sage50({
 });
 
 // a simple database query
-sage.db.queryAsync("SELECT TOP 5 ACCOUNT_REF, SPLIT_NUMBER FROM AUDIT_SPLIT").then(function(splits){
+sage.query("SELECT TOP 5 ACCOUNT_REF, SPLIT_NUMBER FROM AUDIT_SPLIT").then(function(splits){
 	console.log('5 SPLITS:', splits);
 });
 
