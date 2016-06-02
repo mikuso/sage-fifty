@@ -30,7 +30,6 @@ module.exports = Promise.method(function Bridge(options, onprogress){
 			function parseJSONOut(js){
 				if (!js || !js.type) {
 					reject(Error("Invalid JSON response"));
-					cp.kill();
 				}
 
 				switch (js.type) {
@@ -41,7 +40,6 @@ module.exports = Promise.method(function Bridge(options, onprogress){
 					case 'error':
 						debug("->error", js.message);
 						reject(Error(js.message));
-						cp.kill();
 						break;
 					case 'data':
 						debug("->data");

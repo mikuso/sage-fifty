@@ -1,6 +1,6 @@
 Description
 -----------
-This is an early prototype of a Sage 50 Accounts interface for NodeJS.
+This is an early prototype of a Sage 50 Accounts interface for NodeJS. Not suitable for production use.
 
 ![Dependencies](https://david-dm.org/mikuso/sage-fifty.svg)
 ![Issues](https://img.shields.io/github/issues/mikuso/sage-fifty.svg)
@@ -45,6 +45,12 @@ sage.payInFull({
 }).then(function(result){
 	console.log('DONE PayInFull test', result);
 });
+
+// get splits
+sage.getSplitsByRange({start:10, count:5}).then(function(splits){
+	console.log('RANGE SPLITS', splits);
+});
+
 ```
 
 Notes
