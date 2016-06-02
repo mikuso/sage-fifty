@@ -51,6 +51,14 @@ sage.getSplitsByRange({start:10, count:5}).then(function(splits){
 	console.log('RANGE SPLITS', splits);
 });
 
+// get a stream of all splits, fetched in chunks of 2000
+sage.getAllSplitsStream(2000)
+	.on('data', (s)=>{
+		console.log('split', s);
+	})
+	.once('end', ()=>{
+		console.log('split stream ended');
+	});
 ```
 
 Notes

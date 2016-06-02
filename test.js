@@ -29,3 +29,12 @@ sage.payInFull({
 sage.getSplitsByRange({start:1, count:3}).then(function(splits){
 	console.log('RANGE SPLITS', splits);
 });
+
+// get a stream of splits, fetched in chunks of 2000
+sage.getAllSplitsStream(2000)
+	.on('data', (s)=>{
+		console.log('split', s);
+	})
+	.once('end', ()=>{
+		console.log('split stream ended');
+	});

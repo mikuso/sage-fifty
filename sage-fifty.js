@@ -5,6 +5,8 @@ var _ = require('lodash');
 var path = require('path');
 var Bridge = require('./bridge');
 var debug = require('debug')('sage-fifty');
+var promizee = require('promizee');
+var stream = require('stream');
 
 function Sage50(options) {
     if (!options) {
@@ -105,6 +107,49 @@ Sage50.prototype.getSplits = function(options) {
             return _.zipObject(headings, line);
         });
     });
+}
+
+Sage50.prototype.getAllSplitsStream = function(chunkSize) {
+    var curPos = 1;
+    chunkSize = chunkSize || 100;
+    var eof = false;
+    var sg = this;
+
+    debug("streaming splits in chunks of %s", chunkSize);
+
+    var splitCache = [];
+
+    var getMoreSplits = Promise.method(() => {
+        if (splitCache.length > 0) {
+            return;
+        }
+
+        debug('fetching next chunk of splits');
+        return sg.getSplitsByRange({start: curPos, count: chunkSize}).then((splits) => {
+            splitCache.push.apply(splitCache, splits.reverse());
+            curPos += chunkSize;
+            if (splits.length != chunkSize) {
+                eof = true;
+            }
+        });
+    });
+
+    var getNextSplit = promizee(Promise.method(() => {
+        if (eof && !splitCache.length) {
+            debug('end of split stream');
+            return null;
+        }
+        return getMoreSplits().then(() => splitCache.pop());
+    }));
+
+    var readable = new stream.Readable({
+        objectMode: true,
+        read: function() {
+            getNextSplit().then((s) => this.push(s));
+        }
+    });
+
+    return readable;
 }
 
 Sage50.prototype._dbConnect = function() {
