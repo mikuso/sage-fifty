@@ -5,7 +5,7 @@ var odbc = require('odbc');
 Promise.promisifyAll(odbc.Database.prototype);
 var _ = require('lodash');
 var path = require('path');
-var PayInFull = require('./sage-fifty-payinfull');
+var Bridge = require('./bridge');
 var debug = require('debug')('sage-fifty');
 
 class Sage50 {
@@ -66,16 +66,34 @@ class Sage50 {
 			throw Error("An array of splits is required and must not be empty");
 		}
 
-	    return PayInFull({
-	        SageDataPath : this._accdata,
-	        SageUsername : this._username,
-	        SagePassword : this._password,
-	        BankCode     : options.bankCode,
-	        Reference    : options.reference,
-	        Details      : "Sales Receipt",
-	        AccountRef   : options.accountRef,
-	        Splits       : options.splits
+	    return Bridge({
+	    	action		 : "PayInFull",
+	        accdata      : this._accdata,
+	        username     : this._username,
+	        password     : this._password,
+	        bankCode     : options.bankCode,
+	        reference    : options.reference,
+	        details      : "Sales Receipt",
+	        accountRef   : options.accountRef,
+	        splits       : options.splits
 	    }, options.onprogress);
+	}
+
+	getSplitsByRange (options) {
+		return Bridge({
+	    	action		 : "GetSplitsByRange",
+	        accdata      : this._accdata,
+	        username     : this._username,
+	        password     : this._password,
+	        start 		 : options.start || 1,
+	        count 		 : options.count || 1000
+	    }, options.onprogress).then(function(raw){
+	    	var headings = ["recordNumber", "details", "type", "tranNumber"];
+	    	var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
+	    	return zipped.map(function(line){
+	    		return _.zipObject(headings, line);
+	    	});
+	    });
 	}
 
 	_dbConnect () {

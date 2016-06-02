@@ -7,21 +7,30 @@ var sage = new Sage50({
 	version: 22
 });
 
-// a database query
-sage.query("SELECT TOP 5 account_ref, split_number FROM audit_split").then(function(splits){
-	console.log('5 SPLITS:', splits);
-});
+// // a database query
+// sage.query("SELECT TOP 5 account_ref, split_number FROM audit_split").then(function(splits){
+// 	console.log('5 SPLITS:', splits);
+// });
 
-// mark splits as paid
-sage.payInFull({
-	bankCode: 1200,
-	accountRef: "ABS001",
-	reference: "Test",
-	splits: [1023,1021,1020,1019,1010,1024],
-	onprogress: function(a,b){
-		console.log('PayInFull Progress %s/%s', a, b);
-	}
-}).then(function(res){
-	console.log('DONE PayInFull test', res);
-});
+// // mark splits as paid
+// sage.payInFull({
+// 	bankCode: 1200,
+// 	accountRef: "ABS001",
+// 	reference: "Test",
+// 	splits: [1023,1021,1020,1019,1010,1024],
+// 	onprogress: function(a,b){
+// 		console.log('PayInFull Progress %s/%s', a, b);
+// 	}
+// }).then(function(res){
+// 	console.log('DONE PayInFull test', res);
+// });
 
+var sage = new Sage50({
+	accdata: "\\\\sageserver2\\SageData\\3WM\\ACCDATA",
+	username: "SOI",
+	password: "IOS",
+	version: 22
+});
+sage.getSplitsByRange({start:20200, count:50}).then(function(splits){
+	console.log('SPLITS', splits);
+})
