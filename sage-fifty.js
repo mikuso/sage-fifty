@@ -76,6 +76,14 @@ Sage50.prototype.payInFull = function(options) {
     }, options.onprogress);
 }
 
+var zipSplits = function(raw){
+    var headings = ["recordNumber", "headerNumber", "details", "type", "tranNumber", "amountPaid", "amountNet", "amountTax"];
+    var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
+    return zipped.map(function(line){
+        return _.zipObject(headings, line);
+    });
+};
+
 Sage50.prototype.getSplitsByRange = function(options) {
     return Bridge({
         action       : "GetSplitsByRange",
@@ -84,14 +92,8 @@ Sage50.prototype.getSplitsByRange = function(options) {
         password     : this._password,
         start        : options.start || 1,
         count        : options.count || 1000
-    }, options.onprogress).then(function(raw){
-        var headings = ["recordNumber", "details", "type", "tranNumber"];
-        var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
-        return zipped.map(function(line){
-            return _.zipObject(headings, line);
-        });
-    });
-}
+    }, options.onprogress).then(zipSplits);
+};
 
 Sage50.prototype.getSplits = function(options) {
     return Bridge({
@@ -100,14 +102,8 @@ Sage50.prototype.getSplits = function(options) {
         username     : this._username,
         password     : this._password,
         splits       : options.splits
-    }, options.onprogress).then(function(raw){
-        var headings = ["recordNumber", "details", "type", "tranNumber"];
-        var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
-        return zipped.map(function(line){
-            return _.zipObject(headings, line);
-        });
-    });
-}
+    }, options.onprogress).then(zipSplits);
+};
 
 Sage50.prototype.getAllSplitsStream = function(chunkSize) {
     var curPos = 1;
