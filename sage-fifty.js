@@ -77,7 +77,7 @@ Sage50.prototype.payInFull = function(options) {
 }
 
 var zipSplits = function(raw){
-    var headings = ["recordNumber", "headerNumber", "details", "type", "tranNumber", "amountPaid", "amountNet", "amountTax"];
+    var headings = ["recordNumber", "headerNumber", "deletedFlag", "details", "type", "tranNumber", "amountPaid", "amountNet", "amountTax"];
     var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
     return zipped.map(function(line){
         return _.zipObject(headings, line);
