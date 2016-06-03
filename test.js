@@ -38,3 +38,17 @@ sage.getAllSplitsStream(2000)
 	.once('end', ()=>{
 		console.log('split stream ended');
 	});
+	
+// get a stream of headers, fetched in chunks of 2000
+sage.getAllHeadersStream(2000)
+	.on('data', (s)=>{
+		console.log('header', s);
+	})
+	.once('end', ()=>{
+		console.log('header stream ended');
+	});
+
+// get headers
+sage.getHeadersByRange({start:1, count:10}).then(function(headers){
+	console.log('RANGE HEADERS', headers);
+});
