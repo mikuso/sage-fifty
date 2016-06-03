@@ -76,6 +76,79 @@ Sage50.prototype.payInFull = function(options) {
     }, options.onprogress);
 }
 
+var zipHeaders = function(raw){
+    var headings = ["recordNumber", "accountRef", "deletedFlag", "details", "invRef", "type", "amountPaid", "amountNet", "amountTax"];
+    var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
+    return zipped.map(function(line){
+        return _.zipObject(headings, line);
+    });
+};
+
+Sage50.prototype.getHeadersByRange = function(options) {
+    return Bridge({
+        action       : "GetHeadersByRange",
+        accdata      : this._accdata,
+        username     : this._username,
+        password     : this._password,
+        start        : options.start || 1,
+        count        : options.count || 1000
+    }, options.onprogress).then(zipHeaders);
+};
+
+Sage50.prototype.getHeaders = function(options) {
+    return Bridge({
+        action       : "GetHeadersByRange",
+        accdata      : this._accdata,
+        username     : this._username,
+        password     : this._password,
+        Headers      : options.headers
+    }, options.onprogress).then(zipHeaders);
+};
+
+Sage50.prototype.getAllHeadersStream = function(chunkSize) {
+    var curPos = 1;
+    chunkSize = chunkSize || 100;
+    var eof = false;
+    var sg = this;
+
+    debug("streaming headers in chunks of %s", chunkSize);
+
+    var headerCache = [];
+
+    var getMoreHeaders = Promise.method(() => {
+        if (headerCache.length > 0) {
+            return;
+        }
+
+        debug('fetching next chunk of headers');
+        return sg.getHeadersByRange({start: curPos, count: chunkSize}).then((headers) => {
+            headerCache.push.apply(headerCache, headers.reverse());
+            curPos += chunkSize;
+            if (headers.length != chunkSize) {
+                eof = true;
+            }
+        });
+    });
+
+    var getNextHeader = promizee(() => {
+        if (eof && !headerCache.length) {
+            debug('end of header stream');
+            return null;
+        }
+        return getMoreHeaders().then(() => headerCache.pop());
+    });
+
+    var readable = new stream.Readable({
+        objectMode: true,
+        read: function() {
+            getNextHeader().then((s) => this.push(s));
+        }
+    });
+
+    return readable;
+}
+
+
 var zipSplits = function(raw){
     var headings = ["recordNumber", "headerNumber", "deletedFlag", "details", "type", "tranNumber", "amountPaid", "amountNet", "amountTax"];
     var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
