@@ -130,13 +130,13 @@ Sage50.prototype.getAllSplitsStream = function(chunkSize) {
         });
     });
 
-    var getNextSplit = promizee(Promise.method(() => {
+    var getNextSplit = promizee(() => {
         if (eof && !splitCache.length) {
             debug('end of split stream');
             return null;
         }
         return getMoreSplits().then(() => splitCache.pop());
-    }));
+    });
 
     var readable = new stream.Readable({
         objectMode: true,
