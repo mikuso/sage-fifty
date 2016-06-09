@@ -6,7 +6,6 @@ var path = require('path');
 var queues = {};
 
 module.exports = function(company, username){
-	company = path.basename(company);
 	var key = [company,username].join("\t-\t");
 
 	if (!queues[key]) {
