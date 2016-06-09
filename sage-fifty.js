@@ -76,6 +76,79 @@ Sage50.prototype.payInFull = function(options) {
     }, options.onprogress);
 }
 
+var zipInvoices = function(raw){
+    var headings = ["recordNumber", "accountRef", "deletedFlag", "custOrderNumber", "invRef", "type"];
+    var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
+    return zipped.map(function(line){
+        return _.zipObject(headings, line);
+    });
+};
+
+Sage50.prototype.getInvoicesByRange = function(options) {
+    return Bridge({
+        action       : "GetInvoicesByRange",
+        accdata      : this._accdata,
+        username     : this._username,
+        password     : this._password,
+        start        : options.start || 1,
+        count        : options.count || 1000
+    }, options.onprogress).then(zipInvoices);
+};
+
+Sage50.prototype.getInvoices = function(options) {
+    return Bridge({
+        action       : "GetInvoicesByRange",
+        accdata      : this._accdata,
+        username     : this._username,
+        password     : this._password,
+        invoiceNumbers : options.invoiceNumbers
+    }, options.onprogress).then(zipInvoices);
+};
+
+Sage50.prototype.getAllInvoicesStream = function(chunkSize) {
+    var curPos = 1;
+    chunkSize = chunkSize || 100;
+    var eof = false;
+    var sg = this;
+
+    debug("streaming invoices in chunks of %s", chunkSize);
+
+    var cache = [];
+
+    var getMore = Promise.method(() => {
+        if (cache.length > 0) {
+            return;
+        }
+
+        debug('fetching next chunk');
+        return sg.getInvoicesByRange({start: curPos, count: chunkSize}).then((chunk) => {
+            cache.push.apply(cache, chunk.reverse());
+            curPos += chunkSize;
+            if (chunk.length != chunkSize) {
+                eof = true;
+            }
+        });
+    });
+
+    var getNext = promizee(() => {
+        if (eof && !cache.length) {
+            debug('end of stream');
+            return null;
+        }
+        return getMore().then(() => cache.pop());
+    });
+
+    var readable = new stream.Readable({
+        objectMode: true,
+        read: function() {
+            getNext().then((s) => this.push(s));
+        }
+    });
+
+    return readable;
+}
+
+
 var zipHeaders = function(raw){
     var headings = ["recordNumber", "accountRef", "deletedFlag", "details", "invRef", "type", "amountPaid", "amountNet", "amountTax"];
     var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
@@ -101,7 +174,7 @@ Sage50.prototype.getHeaders = function(options) {
         accdata      : this._accdata,
         username     : this._username,
         password     : this._password,
-        Headers      : options.headers
+        headers      : options.headers
     }, options.onprogress).then(zipHeaders);
 };
 
