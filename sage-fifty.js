@@ -77,7 +77,7 @@ Sage50.prototype.payInFull = function(options) {
 }
 
 var zipInvoices = function(raw){
-    var headings = ["recordNumber", "accountRef", "deletedFlag", "custOrderNumber", "invRef", "type"];
+    var headings = ["recordNumber", "accountRef", "deletedFlag", "custOrderNumber", "invRef", "date", "type"];
     var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
     return zipped.map(function(line){
         return _.zipObject(headings, line);
