@@ -76,12 +76,13 @@ Sage50.prototype.payInFull = function(options) {
     }, options.onprogress);
 }
 
-var zipInvoices = function(raw){
-    var headings = ["recordNumber", "accountRef", "deletedFlag", "custOrderNumber", "invRef", "date", "type"];
-    var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
-    return zipped.map(function(line){
-        return _.zipObject(headings, line);
-    });
+var zipBridgeResponse = function(raw){
+    var headings = Object.keys(raw).filter(k => (raw[k] instanceof Array));
+    var zipped = _.zip.apply(_, headings.map(head => raw[head]));
+    return {
+        recordCount: raw.recordCount,
+        rows: zipped.map(line => _.zipObject(headings, line))
+    };
 };
 
 Sage50.prototype.getInvoicesByRange = function(options) {
@@ -92,7 +93,7 @@ Sage50.prototype.getInvoicesByRange = function(options) {
         password     : this._password,
         start        : options.start || 1,
         count        : options.count || 1000
-    }, options.onprogress).then(zipInvoices);
+    }).then(zipBridgeResponse);
 };
 
 Sage50.prototype.getInvoices = function(options) {
@@ -102,16 +103,15 @@ Sage50.prototype.getInvoices = function(options) {
         username     : this._username,
         password     : this._password,
         invoiceNumbers : options.invoiceNumbers
-    }, options.onprogress).then(zipInvoices);
+    }).then(zipBridgeResponse);
 };
 
-Sage50.prototype.getAllInvoicesStream = function(chunkSize) {
+Sage50.prototype.getAllResourceStream = function(chunkSize, onProgress, rangeFunc) {
     var curPos = 1;
     chunkSize = chunkSize || 100;
     var eof = false;
-    var sg = this;
 
-    debug("streaming invoices in chunks of %s", chunkSize);
+    debug("streaming resource chunks of %s", chunkSize);
 
     var cache = [];
 
@@ -121,10 +121,15 @@ Sage50.prototype.getAllInvoicesStream = function(chunkSize) {
         }
 
         debug('fetching next chunk');
-        return sg.getInvoicesByRange({start: curPos, count: chunkSize}).then((chunk) => {
-            cache.push.apply(cache, chunk.reverse());
+        return rangeFunc.call(this, {start: curPos, count: chunkSize}).then(data => {
+            onProgress({
+                pct: Math.min(curPos + chunkSize, data.recordCount) / data.recordCount,
+                current: Math.min(curPos + chunkSize, data.recordCount),
+                total: data.recordCount
+            });
+            cache.push.apply(cache, data.rows.reverse());
             curPos += chunkSize;
-            if (chunk.length != chunkSize) {
+            if (data.rows.length != chunkSize) {
                 eof = true;
             }
         });
@@ -148,14 +153,10 @@ Sage50.prototype.getAllInvoicesStream = function(chunkSize) {
     return readable;
 }
 
+Sage50.prototype.getAllInvoicesStream = function(chunkSize, onProgress) {
+    return this.getAllResourceStream(chunkSize, onProgress, this.getInvoicesByRange);
+}
 
-var zipHeaders = function(raw){
-    var headings = ["recordNumber", "accountRef", "deletedFlag", "details", "invRef", "type", "amountPaid", "amountNet", "amountTax"];
-    var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
-    return zipped.map(function(line){
-        return _.zipObject(headings, line);
-    });
-};
 
 Sage50.prototype.getHeadersByRange = function(options) {
     return Bridge({
@@ -165,7 +166,7 @@ Sage50.prototype.getHeadersByRange = function(options) {
         password     : this._password,
         start        : options.start || 1,
         count        : options.count || 1000
-    }, options.onprogress).then(zipHeaders);
+    }, options.onprogress).then(zipBridgeResponse);
 };
 
 Sage50.prototype.getHeaders = function(options) {
@@ -175,60 +176,13 @@ Sage50.prototype.getHeaders = function(options) {
         username     : this._username,
         password     : this._password,
         headers      : options.headers
-    }, options.onprogress).then(zipHeaders);
+    }, options.onprogress).then(zipBridgeResponse);
 };
 
 Sage50.prototype.getAllHeadersStream = function(chunkSize) {
-    var curPos = 1;
-    chunkSize = chunkSize || 100;
-    var eof = false;
-    var sg = this;
-
-    debug("streaming headers in chunks of %s", chunkSize);
-
-    var headerCache = [];
-
-    var getMoreHeaders = Promise.method(() => {
-        if (headerCache.length > 0) {
-            return;
-        }
-
-        debug('fetching next chunk of headers');
-        return sg.getHeadersByRange({start: curPos, count: chunkSize}).then((headers) => {
-            headerCache.push.apply(headerCache, headers.reverse());
-            curPos += chunkSize;
-            if (headers.length != chunkSize) {
-                eof = true;
-            }
-        });
-    });
-
-    var getNextHeader = promizee(() => {
-        if (eof && !headerCache.length) {
-            debug('end of header stream');
-            return null;
-        }
-        return getMoreHeaders().then(() => headerCache.pop());
-    });
-
-    var readable = new stream.Readable({
-        objectMode: true,
-        read: function() {
-            getNextHeader().then((s) => this.push(s));
-        }
-    });
-
-    return readable;
+    return this.getAllResourceStream(chunkSize, onProgress, this.getHeadersByRange);
 }
 
-
-var zipSplits = function(raw){
-    var headings = ["recordNumber", "headerNumber", "deletedFlag", "details", "type", "tranNumber", "amountPaid", "amountNet", "amountTax"];
-    var zipped = _.zip.apply(_, headings.map(function(head){ return raw[head]; }));
-    return zipped.map(function(line){
-        return _.zipObject(headings, line);
-    });
-};
 
 Sage50.prototype.getSplitsByRange = function(options) {
     return Bridge({
@@ -238,7 +192,7 @@ Sage50.prototype.getSplitsByRange = function(options) {
         password     : this._password,
         start        : options.start || 1,
         count        : options.count || 1000
-    }, options.onprogress).then(zipSplits);
+    }, options.onprogress).then(zipBridgeResponse);
 };
 
 Sage50.prototype.getSplits = function(options) {
@@ -248,50 +202,11 @@ Sage50.prototype.getSplits = function(options) {
         username     : this._username,
         password     : this._password,
         splits       : options.splits
-    }, options.onprogress).then(zipSplits);
+    }, options.onprogress).then(zipBridgeResponse);
 };
 
 Sage50.prototype.getAllSplitsStream = function(chunkSize) {
-    var curPos = 1;
-    chunkSize = chunkSize || 100;
-    var eof = false;
-    var sg = this;
-
-    debug("streaming splits in chunks of %s", chunkSize);
-
-    var splitCache = [];
-
-    var getMoreSplits = Promise.method(() => {
-        if (splitCache.length > 0) {
-            return;
-        }
-
-        debug('fetching next chunk of splits');
-        return sg.getSplitsByRange({start: curPos, count: chunkSize}).then((splits) => {
-            splitCache.push.apply(splitCache, splits.reverse());
-            curPos += chunkSize;
-            if (splits.length != chunkSize) {
-                eof = true;
-            }
-        });
-    });
-
-    var getNextSplit = promizee(() => {
-        if (eof && !splitCache.length) {
-            debug('end of split stream');
-            return null;
-        }
-        return getMoreSplits().then(() => splitCache.pop());
-    });
-
-    var readable = new stream.Readable({
-        objectMode: true,
-        read: function() {
-            getNextSplit().then((s) => this.push(s));
-        }
-    });
-
-    return readable;
+    return this.getAllResourceStream(chunkSize, onProgress, this.getSplitsByRange);
 }
 
 Sage50.prototype._dbConnect = function() {
