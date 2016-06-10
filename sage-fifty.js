@@ -122,7 +122,7 @@ Sage50.prototype.getAllResourceStream = function(chunkSize, onProgress, rangeFun
 
         debug('fetching next chunk');
         return rangeFunc.call(this, {start: curPos, count: chunkSize}).then(data => {
-            onProgress({
+            onProgress && onProgress({
                 pct: Math.min(curPos + chunkSize, data.recordCount) / data.recordCount,
                 current: Math.min(curPos + chunkSize, data.recordCount),
                 total: data.recordCount
@@ -179,7 +179,7 @@ Sage50.prototype.getHeaders = function(options) {
     }, options.onprogress).then(zipBridgeResponse);
 };
 
-Sage50.prototype.getAllHeadersStream = function(chunkSize) {
+Sage50.prototype.getAllHeadersStream = function(chunkSize, onProgress) {
     return this.getAllResourceStream(chunkSize, onProgress, this.getHeadersByRange);
 }
 
@@ -205,7 +205,7 @@ Sage50.prototype.getSplits = function(options) {
     }, options.onprogress).then(zipBridgeResponse);
 };
 
-Sage50.prototype.getAllSplitsStream = function(chunkSize) {
+Sage50.prototype.getAllSplitsStream = function(chunkSize, onProgress) {
     return this.getAllResourceStream(chunkSize, onProgress, this.getSplitsByRange);
 }
 
