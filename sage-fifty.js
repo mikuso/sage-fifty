@@ -98,7 +98,7 @@ Sage50.prototype.getInvoicesByRange = function(options) {
 
 Sage50.prototype.getInvoices = function(options) {
     return Bridge({
-        action       : "GetInvoicesByRange",
+        action       : "GetInvoices",
         accdata      : this._accdata,
         username     : this._username,
         password     : this._password,
@@ -171,7 +171,7 @@ Sage50.prototype.getHeadersByRange = function(options) {
 
 Sage50.prototype.getHeaders = function(options) {
     return Bridge({
-        action       : "GetHeadersByRange",
+        action       : "GetHeaders",
         accdata      : this._accdata,
         username     : this._username,
         password     : this._password,
@@ -197,7 +197,7 @@ Sage50.prototype.getSplitsByRange = function(options) {
 
 Sage50.prototype.getSplits = function(options) {
     return Bridge({
-        action       : "GetSplitsByRange",
+        action       : "GetSplits",
         accdata      : this._accdata,
         username     : this._username,
         password     : this._password,
