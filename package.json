@@ -1,6 +1,6 @@
 {
   "name": "sage-fifty",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "Interact with Sage50 Accounts",
   "main": "sage-fifty.js",
   "keywords": [
