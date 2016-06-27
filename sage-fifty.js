@@ -59,11 +59,7 @@ Sage50.prototype.payInFull = function(options) {
         throw Error("A customer account reference is required");
     }
 
-    if (!options.splits || !options.splits.length) {
-        throw Error("An array of splits is required and must not be empty");
-    }
-
-    return Bridge({
+    var bridgeConf = {
         action       : "PayInFull",
         accdata      : this._accdata,
         username     : this._username,
@@ -71,9 +67,18 @@ Sage50.prototype.payInFull = function(options) {
         bankCode     : options.bankCode,
         reference    : options.reference,
         details      : "Sales Receipt",
-        accountRef   : options.accountRef,
-        splits       : options.splits
-    }, options.onprogress);
+        accountRef   : options.accountRef
+    };
+
+    if (!!options.splits && options.splits.length) {
+        bridgeConf.splits = options.splits;
+    } else if (!!options.headers && options.headers.length) {
+        bridgeConf.headers = options.headers;
+    } else {
+        throw Error("An array of splits or headers is required and must not be empty");
+    }
+
+    return Bridge(bridgeConf, options.onprogress);
 }
 
 var zipBridgeResponse = function(raw){
