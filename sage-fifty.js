@@ -66,7 +66,6 @@ Sage50.prototype.payInFull = function(options) {
         password     : this._password,
         bankCode     : options.bankCode,
         reference    : options.reference,
-        details      : "Sales Receipt",
         accountRef   : options.accountRef
     };
 
