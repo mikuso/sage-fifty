@@ -150,7 +150,12 @@ Sage50.prototype.getAllResourceStream = function(chunkSize, onProgress, rangeFun
     var readable = new stream.Readable({
         objectMode: true,
         read: function() {
-            getNext().then((s) => this.push(s));
+            getNext()
+                .then((s) => this.push(s))
+                .catch(err => {
+                    // err - probably username is in use or something like that
+                    this.emit('error', err);
+                });
         }
     });
 
