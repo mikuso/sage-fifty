@@ -16,7 +16,7 @@
     "bluebird": "*",
     "debug": "^2.2.0",
     "lodash": "^4.13.1",
-    "odbc": "^1.2.1",
+    "odbc": "1.2.1",
     "promise-queue": "^2.2.3",
     "promizee": "^1.0.1"
   },
