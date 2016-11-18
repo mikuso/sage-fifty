@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "*",
+    "bluebird-retry": "^0.8.0",
     "debug": "^2.2.0",
     "lodash": "^4.13.1",
     "odbc": "1.2.1",
