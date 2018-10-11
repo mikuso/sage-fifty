@@ -19,7 +19,7 @@ module.exports = Promise.method(function Bridge(options, onprogress){
     	return sageAccessQueue(options.accdata, options.username)(function(){
 
     		debug("Spawning", bridgeExe, "with params", options);
-    		var cp = child_process.spawn(bridgeExe, ["--pipe"], {stdio: 'pipe'});
+    		var cp = child_process.spawn(bridgeExe, ["--pipe"], {stdio: 'pipe', windowsHide: true});
 
     		return new Promise(function(resolve, reject){
 
