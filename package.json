@@ -13,12 +13,12 @@
   },
   "license": "ISC",
   "dependencies": {
-    "bluebird": "*",
+    "bluebird": "^3.5.3",
     "bluebird-retry": "^0.8.0",
-    "debug": "^2.2.0",
-    "lodash": "^4.13.1",
+    "debug": "^2.6.9",
+    "lodash": "^4.17.11",
     "odbc": "1.2.1",
-    "promise-queue": "^2.2.3",
+    "promise-queue": "^2.2.5",
     "promizee": "^1.0.1"
   },
   "repository": {

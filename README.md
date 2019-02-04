@@ -9,7 +9,7 @@ Prerequisites
 -------------
 * Windows
 * .NET framework 4.5
-* Sage 50 Accounts Professional v22 (2016)
+* Sage 50c Accounts Professional v25 (2019)
 * Sage Line 50 ODBC drivers (installed with Sage)
 * Sage Data Objects (SDO) COM libraries (installed with Sage)
 
@@ -24,7 +24,8 @@ var Sage50 = require('sage-fifty');
 var sage = new Sage50({
 	accdata: "C:\\ProgramData\\Sage\\Accounts\\2016\\Demodata\\ACCDATA",
 	username: "manager",
-	version: 22
+	password: "password",
+	version: 25
 });
 
 // a simple database query
